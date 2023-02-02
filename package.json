@@ -1,0 +1,27 @@
+{
+  "name": "track-my-employees",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "express": "^4.17.1",
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "watch": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j-pohahau5/track-my-employees.git"
+  },
+  "author": "jonathan pohahau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/j-pohahau5/track-my-employees/issues"
+  },
+  "homepage": "https://github.com/j-pohahau5/track-my-employees#readme"
+}
