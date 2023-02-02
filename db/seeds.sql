@@ -74,7 +74,7 @@ VALUES ("John", "Smith", 1, null),
 -- SELECT * FROM role;
 -- SELECT * FROM employee;
 
--- SELECT r.title, r.title, d.name as department, r.salary 
+-- SELECT r.id, r.title, d.name as department, r.salary 
 -- FROM role r
 -- JOIN department d on d.id = r.department_id;
 
