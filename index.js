@@ -1,7 +1,9 @@
 const inquirer = require("inquirer");
-const db = require("./config/connection");
+const Department = require("./lib/department");
+const Employee = require("./lib/employee");
+const Role = require("./lib/role");
 
-const addDepartment = () => {
+function addDepartment() {
   return inquirer
     .prompt([
       {
@@ -11,17 +13,15 @@ const addDepartment = () => {
       },
     ])
     .then(function ({ name }) {
-      db.query(
-        "INSERT INTO department(name) VALUES(?)",
-        (name), function (err, result) {
-            if (err) throw err;
-      }
-      );
+      const department = new Department(null, name);
+      department.addDepartment();
       startsPrompts();
     });
-};
+}
 
 const addRole = () => {
+    let department = new Department();
+    department.getDepartments().then((department) => {
   return inquirer
     .prompt([
       {
@@ -38,21 +38,24 @@ const addRole = () => {
         name: "department_name",
         type: "list",
         message: "Which department does does the role belong to?",
-        choices: ["Sales", "Engineering", "Finance", "Legal"],
+        choices: department.map((d) => {
+            return `${d.id} ${d.name}`;
+          }),
       },
     ])
     .then(function ({ title, salary, department_name }) {
-      db.query(
-        "INSERT INTO role (title, department_id, salary) VALUES(?)",
-        (title, salary, department_name), function (err, result) {
-            if (err) throw err;
-        }
-      );
+      const role = new Role(null, title, salary, department_name);
+      role.addRole;
       startsPrompts();
     });
+});
 };
 
 const addEmployee = () => {
+    let role = new Role();
+  role.getRoles().then((role) => {
+    let employee = new Employee();
+    employee.getEmployees().then((employee) => {
   return inquirer
     .prompt([
       {
@@ -66,110 +69,108 @@ const addEmployee = () => {
         message: "What is the employee's last name?",
       },
       {
-        name: "role",
+        name: "role_id",
         type: "list",
         message: "What is the employee's role?",
-        choices: [
-          "Sales Lead",
-          "Salesperson",
-          "Lead Engineer",
-          "Software Engineer",
-          "Account Manager",
-          "Accountant",
-          "Legal Team Lead",
-          "Lawyer",
-        ],
+        choices: role.map((r) => {
+            return `${r.id}. ${r.title}`;
+          }),
       },
       {
-        name: "manager",
+        name: "manager_id",
         type: "list",
         message: "Who is the employee's employee's manager?",
-        choices: [
-          "None",
-          "John Smith",
-          "Mike Chan",
-          "Ashley Rodriguez",
-          "Kevin Tupik",
-          "Kunal Singh",
-          "Malia Brown",
-          "Sarah Lourd",
-          "Tom Allen",
-        ],
+        choices: employee.map((e) => {
+            return `${e.first_name} ${e.last_name}`;
+          }),
       },
     ])
-    .then(function ({ first_name, last_name, role, manager }) {
-      db.query(
-        "SELECT e.first_name, e.last_name, r.title, d.name as department, r.salary, e.manager_id FROM employee AS e JOIN role AS r on r.id = e.role_id INNER JOIN department AS d on d.id = r.department_id;",
-        (first_name, last_name, role, manager), function (err, result) {
-            if (err) throw err;
-        }
+    .then(function ({ first_name, last_name, role_id, manager_id }) {
+      const employee = new Employee(
+        null,
+        first_name,
+        last_name,
+        role_id,
+        manager_id
       );
+      employee.addEmployee;
+      startsPrompts();
+    });
+});
+});
+};
+
+const updateEmployeeRole = () => {
+  let role = new Role();
+  role.getRoles().then((role) => {
+    let employee = new Employee();
+    employee.getEmployees().then((employee) => {
+      return inquirer
+        .prompt([
+          {
+            name: "employee",
+            type: "list",
+            message: "Whish employee's role would you like to update?",
+            choices: employee.map((e) => {
+              return `${e.first_name} ${e.last_name}`;
+            }),
+          },
+          {
+            name: "role",
+            type: "list",
+            message: "Which role do you want to assign the selected employee?",
+            choices: role.map((r) => {
+              return `${r.id}. ${r.title}`;
+            }),
+          },
+        ])
+        .then(function ({ employee, role }) {
+          employee = new Employee().updateEmployee.then(() => {
+            console.log("Successfully Updated Employee Role");
+          });
+          startsPrompts();
+        });
+    });
+  });
+};
+function viewDepartments() {
+  let department = new Department();
+  department
+    .getDepartments()
+    .then((rows) => {
+      console.log("View all Department");
+      console.table(rows);
+    })
+    .then(() => {
+      startsPrompts();
+    });
+}
+
+const viewRoles = () => {
+    let role = new Role();
+    role
+    .getRoles()
+    .then((rows) => {
+      console.log("View all Department");
+      console.table(rows);
+    })
+    .then(() => {
+      startsPrompts();
+    });
+};
+const viewEmployees = () => {
+    let employee = new Employee();
+    employee
+    .getEmployees()
+    .then((rows) => {
+      console.log("View all Department");
+      console.table(rows);
+    })
+    .then(() => {
       startsPrompts();
     });
 };
 
-const updateEmployeeRole = () => {
-  return inquirer
-    .prompt([
-      {
-        name: "employee_name",
-        type: "list",
-        message: "Whish employee's role would you like to update?",
-        choices: [
-          "John Smith",
-          "Mike Chan",
-          "Ashley Rodriguez",
-          "Kevin Tupik",
-          "Kunal Singh",
-          "Malia Brown",
-          "Sarah Lourd",
-          "Tom Allen",
-        ],
-      },
-      {
-        name: "employee_role",
-        type: "list",
-        message: "Which role do you want to assign the selected employee?",
-        choices: [
-          "Sales Lead",
-          "Salesperson",
-          "Lead Engineer",
-          "Software Engineer",
-          "Account Manager",
-          "Accountant",
-          "Legal Team Lead",
-          "Lawyer",
-        ],
-      },
-    ])
-    .then(function ({ employee_name, employee_role }) {
-      startsPrompts();
-    });
-};
-const viewDepartments = () => {
-  db.query(`SELECT * FROM department;`, function (err, results) {
-    console.table(results);
-  });
-  startsPrompts();
-};
-const viewRoles = () => {
-  db.query(
-    `SELECT r.id, r.title, d.name AS department, r.salary FROM role AS r JOIN department AS d on d.id = r.department_id;`,
-    function (err, results) {
-      console.table(results);
-    }
-  );
-  startsPrompts();
-};
-const viewEmployees = () => {
-  db.query(
-    `SELECT e.first_name, e.last_name, r.title, d.name as department, r.salary, e.manager_id FROM employee AS e JOIN role AS r on r.id = e.role_id INNER JOIN department AS d on d.id = r.department_id;`,
-    function (err, results) {
-      console.table(results);
-    }
-  );
-  startsPrompts();
-};
 const startsPrompts = () => {
   return inquirer
     .prompt([
@@ -191,7 +192,7 @@ const startsPrompts = () => {
     .then((chosen) => {
       switch (chosen.selection) {
         case "View All Departments":
-          viewDepartments();
+          viewDepartments(startsPrompts);
           break;
         case "View All Roles":
           viewRoles();
