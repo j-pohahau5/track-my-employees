@@ -81,7 +81,7 @@ const addEmployee = () => {
         type: "list",
         message: "Who is the employee's employee's manager?",
         choices: employee.map((e) => {
-            return `${e.id} ${e.last_name} ${e.last_name}`;
+            return `${e.id} ${e.first_name} ${e.last_name}`;
           }),
       },
     ])
@@ -125,9 +125,8 @@ const updateEmployeeRole = () => {
           },
         ])
         .then(function ({ employee, role }) {
-          employee = new Employee().updateEmployee.then(() => {
+          employee = new Employee().updateEmployee
             console.log("Successfully Updated Employee Role");
-          });
           startsPrompts();
         });
     });
