@@ -1,4 +1,5 @@
 const inquirer = require("inquirer");
+const db = require("./config/connection");
 
 const addDepartment = () => {
   return inquirer
@@ -10,6 +11,12 @@ const addDepartment = () => {
       },
     ])
     .then(function ({ name }) {
+      db.query(
+        "INSERT INTO department(name) VALUES(?)",
+        (name), function (err, result) {
+            if (err) throw err;
+      }
+      );
       startsPrompts();
     });
 };
@@ -35,6 +42,12 @@ const addRole = () => {
       },
     ])
     .then(function ({ title, salary, department_name }) {
+      db.query(
+        "INSERT INTO role (title, department_id, salary) VALUES(?)",
+        (title, salary, department_name), function (err, result) {
+            if (err) throw err;
+        }
+      );
       startsPrompts();
     });
 };
@@ -85,6 +98,12 @@ const addEmployee = () => {
       },
     ])
     .then(function ({ first_name, last_name, role, manager }) {
+      db.query(
+        "SELECT e.first_name, e.last_name, r.title, d.name as department, r.salary, e.manager_id FROM employee AS e JOIN role AS r on r.id = e.role_id INNER JOIN department AS d on d.id = r.department_id;",
+        (first_name, last_name, role, manager), function (err, result) {
+            if (err) throw err;
+        }
+      );
       startsPrompts();
     });
 };
@@ -128,13 +147,28 @@ const updateEmployeeRole = () => {
     });
 };
 const viewDepartments = () => {
-  startsPrompts;
+  db.query(`SELECT * FROM department;`, function (err, results) {
+    console.table(results);
+  });
+  startsPrompts();
 };
 const viewRoles = () => {
-  startsPrompts;
+  db.query(
+    `SELECT r.id, r.title, d.name AS department, r.salary FROM role AS r JOIN department AS d on d.id = r.department_id;`,
+    function (err, results) {
+      console.table(results);
+    }
+  );
+  startsPrompts();
 };
 const viewEmployees = () => {
-  startsPrompts;
+  db.query(
+    `SELECT e.first_name, e.last_name, r.title, d.name as department, r.salary, e.manager_id FROM employee AS e JOIN role AS r on r.id = e.role_id INNER JOIN department AS d on d.id = r.department_id;`,
+    function (err, results) {
+      console.table(results);
+    }
+  );
+  startsPrompts();
 };
 const startsPrompts = () => {
   return inquirer
