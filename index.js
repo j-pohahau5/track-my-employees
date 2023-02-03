@@ -81,7 +81,7 @@ const addEmployee = () => {
         type: "list",
         message: "Who is the employee's employee's manager?",
         choices: employee.map((e) => {
-            return `${e.first_name} ${e.last_name}`;
+            return `${e.id} ${e.last_name} ${e.last_name}`;
           }),
       },
     ])
@@ -112,7 +112,7 @@ const updateEmployeeRole = () => {
             type: "list",
             message: "Whish employee's role would you like to update?",
             choices: employee.map((e) => {
-              return `${e.first_name} ${e.last_name}`;
+              return ` ${e.id} ${e.first_name} ${e.last_name}`;
             }),
           },
           {
